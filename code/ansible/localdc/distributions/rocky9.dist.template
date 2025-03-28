@@ -1,0 +1,3 @@
+DISTNAME="Rocky Linux 9"
+DISTFILE="Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+DISTPLAYBOOKS=""

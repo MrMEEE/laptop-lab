@@ -1,0 +1,7 @@
+<network connections='3'>
+  <name>bridge-lan</name>
+  <bridge name='virbr1' stp='on' delay='0'/>
+  <mac address='52:54:00:5e:fd:cf'/>
+  <ip address='192.168.100.10' netmask='255.255.255.0'>
+  </ip>
+</network>
