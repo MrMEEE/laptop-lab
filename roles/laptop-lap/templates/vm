@@ -200,12 +200,12 @@ echo "Deploying $DISTNAME"
 vm_template=$DISTFILE
 vm_playbooks=$DISTPLAYBOOKS
 
-if [ ! -f $dc_home/distributions/$vm_template ]; then
-	echo "$vm_template does not exists in the $dc_home/distributions/ folder"
+if [ ! -f $dc_home/images/$vm_template ]; then
+	echo "$vm_template does not exists in the $dc_home/images/ folder"
 	exit 0
 fi
 
-cp $dc_home/distributions/$vm_template $vm_image
+cp $dc_home/images/$vm_template $vm_image
 
 # Prepare VM-image
 virt-sysprep --hostname $vm_hostname --enable customize -a $vm_image --ssh-inject root:file:$vm_ssh_key

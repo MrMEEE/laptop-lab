@@ -21,17 +21,17 @@
     - virt-manager
     - libguestfs-tools
     - guestfs-tools
+    - python3-pip
+    - libvirt-dbus
 
 - name: Install Packages with pip
   shell: pip install ansible-builder ansible-navigator --break-system-packages
-  become: true
 
 - name: Install Network Configuration
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
-  become: true
   loop:
     - src: templates/dns-virbr0.service
       dest: /etc/systemd/system/dns-virbr0.service
@@ -61,30 +61,35 @@
     enabled: true
   become: true
 
+- name: Add user to libvirt groups
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: "{{ item }}"
+  with_items:
+    - libvirt
+    - libvirt-qemu
+    - libvirtdbus
+  when: ansible_distribution == "Ubuntu"
+
 - name: Remove default network
   ansible.builtin.shell: virsh net-destroy default
-  become: true
   ignore_errors: true
 
 - name: Remove default network
   ansible.builtin.shell: virsh net-undefine default
-  become: true
   ignore_errors: true
 
 - name: Create default network
   ansible.builtin.shell: virsh net-define --file /tmp/network.xml
-  become: true
 
 - name: Start default network
   ansible.builtin.shell: virsh net-start default
-  become: true
 
 - name: Start and enable virbr0 DNS
   ansible.builtin.systemd:
     name: dns-virbr0
     state: restarted
     enabled: true
-  become: true
 
 - name: Copy directory
   ansible.builtin.copy:
@@ -111,6 +116,11 @@
     - src: templates/rh-register.yml
       dest: /home/{{ ansible_user_id }}/ansible/localdc/playbooks/rh-register.yml
       mode: '0644'
+
+- name: Create images folder
+  ansible.builtin.file:
+    path: /home/{{ ansible_user_id }}/ansible/localdc/images
+    state: directory
 
 - name: Make user that ~/bin does exist
   ansible.builtin.file:
