@@ -62,14 +62,13 @@
   become: true
 
 - name: Add user to libvirt groups
-  user:
-    name: "{{ ansible_user_id }}"
-    groups: "{{ item }}"
+  command: gpasswd -a {{ ansible_user_id }} {{ item }}
   with_items:
     - libvirt
     - libvirt-qemu
     - libvirtdbus
   when: ansible_distribution == "Ubuntu"
+  become: true
 
 - name: Remove default network
   ansible.builtin.shell: virsh net-destroy default
@@ -90,6 +89,13 @@
     name: dns-virbr0
     state: restarted
     enabled: true
+  become: true
+
+- name: Give qemu access to your home folder
+  user:
+    name: libvirt-qemu
+    groups: "{{ ansible_user_id }}"
+  become: true
 
 - name: Copy directory
   ansible.builtin.copy:

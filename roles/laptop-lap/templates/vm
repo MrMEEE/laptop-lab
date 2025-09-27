@@ -206,13 +206,14 @@ if [ ! -f $dc_home/images/$vm_template ]; then
 fi
 
 cp $dc_home/images/$vm_template $vm_image
+chmod 777 $vm_image
 
 # Prepare VM-image
 virt-sysprep --hostname $vm_hostname --enable customize -a $vm_image --ssh-inject root:file:$vm_ssh_key
 
 # Create and startup VM
 cd $dc_home
-sudo ansible-playbook  provision.yml -e vm_image_name=$(echo $vm_image|sed 's/.qcow2//g') -e vm_name=$vm_hostname -e vm_vcpus=$vm_cpu -e vm_ram_mb=$vm_mem -e vm_net=default
+ansible-playbook provision.yml -e vm_image_name=$(echo $vm_image|sed 's/.qcow2//g') -e vm_name=$vm_hostname -e vm_vcpus=$vm_cpu -e vm_ram_mb=$vm_mem -e vm_net=default
 
 mkdir -p $dc_home/inventories
 echo $vm_hostname ansible_user=root > $dc_home/inventories/inventory-$vm_hostname

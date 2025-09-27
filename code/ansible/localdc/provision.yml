@@ -1,6 +1,5 @@
 - name: Provision VM
   hosts: localhost
-  become: true
   tasks:
     - name: Get VMs list
       community.libvirt.virt:
@@ -8,12 +7,18 @@
       register: existing_vms
       changed_when: no
 
+    - name: Save VM template
+      template:
+        src: vm-template.xml.j2
+        dest: /tmp/vm-template.xml
+
     - name: Create VM if not exists
       block:
         - name: Define vm
-          community.libvirt.virt:
-            command: define
-            xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
+          #community.libvirt.virt:
+          #  command: define
+          #  xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
+          command: virsh create --file /tmp/vm-template.xml 
       when: "vm_name not in existing_vms.list_vms"
 
     - name: Ensure VM is started
